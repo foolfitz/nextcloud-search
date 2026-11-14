@@ -2772,8 +2772,16 @@ PHP_TREE_HASH_TODAY = "3577bd320b901cb68fced37bcc004893da66cf85cd35dbbce5a037d21
 # sort, sed and sha256sum over the CRLF normalised tree: 650789dc... both ways,
 # and the same pipeline over git archive HEAD before the step gave 76a4f649...
 # (positive control).
+#
+# Moved on 2026-11-15 by the variants of 臺 and 台 (issue #53): query/rewrite.py
+# adds HAN_VARIANTS and han_variants to the token rewrite of the umlaut, and
+# index/analyzer.py names it in the docstring of chinese_analyzer. No file came
+# or went, so PACKAGE_FILES_TODAY stays at 83. The PHP pair does not move.
+# Recomputed independently with find, sort, sed and sha256sum over the CRLF
+# normalised tree: ee8377c7... both ways, and the same pipeline over the tree
+# of the step before gave 650789dc... (positive control).
 PACKAGE_FILES_TODAY = 83
-PACKAGE_TREE_HASH_TODAY = "650789dc27b6becf762cf5ca506cfaedf9ade3c3173830473ee5163691c257d8"
+PACKAGE_TREE_HASH_TODAY = "ee8377c7a665f5336da2b8a4566bc046a142bf1f03bbba9eb15f3a381c7057a0"
 
 # The raw reading of the run, so that the constant above cannot drift away from
 # the file it was read out of.
