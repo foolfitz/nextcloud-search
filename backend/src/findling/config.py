@@ -513,6 +513,18 @@ OCR_DEFAULT_LANGUAGES = ("deu", "eng", "fra")
 # does not grow with the offer, for the same per page cost as above. An
 # instance with Czech scans sets FINDLING_OCR_LANGUAGES, for example deu+ces.
 #
+# chi_tra made it eleven on 2026-11-15 (issue #53, Traditional Chinese), with
+# its own apt line and build time check like ces and offered like ces. It is
+# the first entry that is not three letters: tesseract names the model chi_tra,
+# and that is the spelling an admin types and _ocr_languages below compares,
+# while only the Debian package spells it chi-tra. Where it stands in the
+# admin's list matters more than for the Latin models, and the order is the
+# admin's to give (measured, docs/measurements/2026-11-zh-ocr): first, as in
+# chi_tra or chi_tra+eng, it reads Chinese at its best and fastest; behind the
+# Latin models, as in deu+eng+fra+chi_tra, the engine puts a space between
+# most pairs of Han characters it reads, which the body_zh chain does not mind
+# and the stored text keeps.
+#
 # This set is maintained together with the apt block in backend/Dockerfile, and
 # backend/tests/test_ocr_languages.py compares the two in both directions (as
 # backend/tests/test_ocr_french.py does for the French half), so the pair
@@ -520,7 +532,7 @@ OCR_DEFAULT_LANGUAGES = ("deu", "eng", "fra")
 # Switching on the Fraktur option means uncommenting tesseract-ocr-frk there and
 # adding "frk" here, in the same change. Adding it here alone would produce a
 # call that tesseract rejects on every page.
-OCR_LANGUAGE_ALLOWLIST = frozenset({"deu", "eng", "fra", "spa", "ita", "nld", "por", "dan", "est", "ces"})
+OCR_LANGUAGE_ALLOWLIST = frozenset({"deu", "eng", "fra", "spa", "ita", "nld", "por", "dan", "est", "ces", "chi_tra"})
 
 # The only place where a body language code turns into a tesseract name, built
 # the way SNOWBALL_NAME above is built and for the same reason: a closed mapping

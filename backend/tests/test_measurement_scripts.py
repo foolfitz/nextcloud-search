@@ -2780,8 +2780,16 @@ PHP_TREE_HASH_TODAY = "3577bd320b901cb68fced37bcc004893da66cf85cd35dbbce5a037d21
 # Recomputed independently with find, sort, sed and sha256sum over the CRLF
 # normalised tree: ee8377c7... both ways, and the same pipeline over the tree
 # of the step before gave 650789dc... (positive control).
+#
+# Moved on 2026-11-15 by the Tesseract model chi_tra (issue #53): config.py
+# adds chi_tra to OCR_LANGUAGE_ALLOWLIST, now eleven entries, the default stays
+# at three. No file came or went, so PACKAGE_FILES_TODAY stays at 83. The PHP
+# pair does not move. Recomputed independently with find, sort, sed and
+# sha256sum over the CRLF normalised tree: 83c9b197... both ways, and the same
+# pipeline over git archive HEAD before the step gave ee8377c7... (positive
+# control).
 PACKAGE_FILES_TODAY = 83
-PACKAGE_TREE_HASH_TODAY = "ee8377c7a665f5336da2b8a4566bc046a142bf1f03bbba9eb15f3a381c7057a0"
+PACKAGE_TREE_HASH_TODAY = "83c9b197d8a0015d5d694e3bac85c5674a92936d0b5ec56faed86cbdeb44a956"
 
 # The raw reading of the run, so that the constant above cannot drift away from
 # the file it was read out of.

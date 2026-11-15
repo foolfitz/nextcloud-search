@@ -57,10 +57,19 @@ NOT_A_TEXT_LANGUAGE = frozenset({"osd"})
 
 
 def _installed_languages() -> set[str]:
-    """The tesseract language packs the apt block of the image installs."""
+    """The tesseract language packs the apt block of the image installs.
+
+    In the spelling of tesseract and of the allowlist: since issue #53 one pack
+    has a name in two parts, which Debian joins with a hyphen
+    (tesseract-ocr-chi-tra) and tesseract with an underscore (chi_tra). The
+    whole name is read, with or without a version, so that a pack of a shape
+    nobody expected still shows up in the comparison below instead of passing
+    it unseen; whether it is pinned is the business of test_ocr_languages.py.
+    """
     source = DOCKERFILE.read_text(encoding="utf-8")
     lines = [line for line in source.splitlines() if not line.lstrip().startswith("#")]
-    return set(re.findall(r"tesseract-ocr-([a-z]{3})=", "\n".join(lines)))
+    found = re.findall(r"tesseract-ocr-([a-z]+(?:-[a-z]+)*)(?==|\s|$)", "\n".join(lines), flags=re.MULTILINE)
+    return {name.replace("-", "_") for name in found}
 
 
 def test_french_is_the_third_default_and_the_order_is_the_argument_order() -> None:

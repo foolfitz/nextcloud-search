@@ -291,6 +291,19 @@ RUN apt-get update \
 # installed size 3722.0 kB. Same pattern as the six above: offered, not a
 # default, proven by its own --list-langs check below.
 #
+# chi_tra joined them on 2026-11-15 (issue #53: Traditional Chinese, the OCR
+# half of the body_zh chain). Verified the same day in the pinned base image
+# with apt-cache show: version 1:4.1.0-2, Architecture: all, source package
+# tesseract-lang, download 1587616 bytes, installed size 2327 kB, and the apt
+# layer of this block grows by 2383872 bytes with it, almost all of it the
+# 2366642 bytes of chi_tra.traineddata (docs/measurements/2026-11-zh-ocr). The
+# one new thing about it is the spelling: Debian names the package with a
+# hyphen, tesseract-ocr-chi-tra, while tesseract, the allowlist and the check
+# below name the language chi_tra. Same pattern as ces otherwise: offered, not
+# a default, proven by its own --list-langs check. The vertical model
+# tesseract-ocr-chi-tra-vert is not installed; docs/ocr.md carries what it was
+# measured to do.
+#
 # What this does NOT do, and the distinction is the whole point: it makes the
 # seven languages available, it does not switch them on. OCR_DEFAULT_LANGUAGES in
 # backend/src/findling/config.py stays at deu, eng and fra, because every extra
@@ -326,14 +339,17 @@ RUN apt-get update \
 # with the repository, because the image is what is distributed. Measured on
 # 2026-09-01, the engine and libtesseract5 share one copyright file and the
 # language packs of that day, deu, eng and osd, share a second one
-# (tessdata_fast), so two copies covered all five packages. The eight packs
-# that joined later, fra on 2026-09-06, the six of 2026-09-21 and ces in
-# 2026-10, are built
+# (tessdata_fast), so two copies covered all five packages. The nine packs
+# that joined later, fra on 2026-09-06, the six of 2026-09-21, ces in
+# 2026-10 and chi_tra on 2026-11-15, are built
 # from the very same source package tesseract-lang and therefore carry the very
 # same debian/copyright. That is a statement about the source package and
 # deliberately not a second byte comparison inside the image, which this
 # repository cannot make without a build; the two copied files carry the
-# obligation either way.
+# obligation either way. For chi_tra the comparison was made once, in a
+# throwaway image of the same base on 2026-11-15: the copyright file of
+# tesseract-ocr-chi-tra and that of tesseract-ocr-deu are byte identical
+# (md5 63a049f5eeaf97ed32fcb2a61e01c016).
 # Both tests below are the fail closed half: an image without the language data
 # or without the licence texts must not be built at all. THIRD-PARTY.md carries
 # the same statement for readers of the repository.
@@ -350,6 +366,7 @@ RUN apt-get update \
         tesseract-ocr-dan=1:4.1.0-2 \
         tesseract-ocr-est=1:4.1.0-2 \
         tesseract-ocr-ces=1:4.1.0-2 \
+        tesseract-ocr-chi-tra=1:4.1.0-2 \
         tesseract-ocr-osd=1:4.1.0-2 \
     && rm -rf /var/lib/apt/lists/* \
     && tesseract --list-langs 2>&1 | grep -qx deu \
@@ -362,6 +379,7 @@ RUN apt-get update \
     && tesseract --list-langs 2>&1 | grep -qx dan \
     && tesseract --list-langs 2>&1 | grep -qx est \
     && tesseract --list-langs 2>&1 | grep -qx ces \
+    && tesseract --list-langs 2>&1 | grep -qx chi_tra \
     && test -s /usr/share/doc/tesseract-ocr/copyright \
     && test -s /usr/share/doc/tesseract-ocr-deu/copyright \
     && install -D -m 0444 /usr/share/doc/tesseract-ocr/copyright \
