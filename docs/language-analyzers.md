@@ -520,14 +520,33 @@ again, held on a real index by `backend/tests/test_chinese_switch.py`, which
 also proves that the Chinese word is not found before the switch and is found
 after it. Switching `zh` off is a rebuild as well and leaves `body_zh` empty.
 
-**Scanned Chinese pages are not readable yet.** This image carries no
-Tesseract model for Chinese; `chi_tra` follows in the next pull request of
-issue #53. Until then a scanned Chinese page is read with the models
-`FINDLING_OCR_LANGUAGES` names and lands in the index as noise, and
-`zh` stands in `findling.config.SCANNERLESS_LANGUAGES`, so the startup line
-about uncovered languages counts it on every instance that switches it on.
-Chinese text that reaches the index without OCR (the text layer of a PDF, an
-office document, plain text) is found through `body_zh` today.
+**Scanned Chinese pages need `chi_tra`.** The image carries the
+Tesseract model for Traditional Chinese, `chi_tra`, offered and not a default
+like every model beyond `deu+eng+fra`. The factory setting does not write a
+single Han character on a Chinese page, so an instance with Chinese scans names
+the model in the second variable:
+`FINDLING_OCR_LANGUAGES=chi_tra` for Chinese scans alone, `chi_tra+eng` with
+English. With German as well, the language most scans are in goes first:
+`chi_tra+deu+eng+fra` costs the German pages two misread umlauts in 3,148
+characters, `deu+eng+fra+chi_tra` costs the stored Chinese text a space
+between most pairs of characters. Until `chi_tra` is on the list, the startup
+line about uncovered languages counts `zh`. What each order costs on Chinese
+and on German pages is in `docs/ocr.md` (addendum of 15.11.2026) and measured
+in `docs/measurements/2026-11-zh-ocr`. Chinese text that reaches the
+index without OCR (the text layer of a PDF, an office document, plain text)
+needs no model at all.
+
+A scan that is already in the index is not read again because the OCR list
+changed: its verdict sticks to the content of the file
+(`findling.store.repo.Store.is_unchanged`), and the re-analysis rebuild works
+from the stored text. Chinese scans read before `chi_tra` was named keep what
+the Latin models made of them until the file changes, or until the index is
+built again from the files. `FINDLING_REBUILD_FALLBACK=fullreindex` does that
+with the rebuild that switching `zh` on starts: the generation is raised, every
+stored verdict goes stale, and the crawl the reindex banner names
+(`occ findling:index --restart`) reads every document again, OCR included
+(`findling.index.rebuild`). It costs the whole extraction of the instance, and
+the combination has not been run for this case.
 
 **An installation that never names `zh` is left alone.** The fifteenth field
 moves `findling.config.SCHEMA_VERSION` from 3 to 4, and the update still starts

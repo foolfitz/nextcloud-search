@@ -172,8 +172,8 @@ LANGUAGE_ALLOWLIST = frozenset(
 # zh joined at the end for issue #53, for the same reason and in the same way:
 # "zh,de" reads as "de,zh", and every set an installation already carries stays
 # byte for byte the same. It has a body field and a chain of its own and no
-# Snowball name, and it is the one code of this tuple without a Tesseract model
-# in the image yet: see SCANNERLESS_LANGUAGES further down.
+# Snowball name, and its scans are read by the Tesseract model chi_tra, which
+# TESSERACT_NAME further down names for it.
 SUPPORTED_LANGUAGES = ("de", "en", "es", "it", "nl", "pt", "cs", "zh")
 
 # The only place where a schema field code turns into a tantivy language name.
@@ -555,11 +555,10 @@ OCR_LANGUAGE_ALLOWLIST = frozenset({"deu", "eng", "fra", "spa", "ita", "nld", "p
 # field and no chain for French, so it is an OCR language this build cannot
 # analyse, which is the one direction that is harmless.
 #
-# One entry per code of SUPPORTED_LANGUAGES, except the codes of
-# SCANNERLESS_LANGUAGES below, which have no Tesseract model in this image and
-# therefore no name to map to. The two together make up SUPPORTED_LANGUAGES
-# exactly, the same shape SNOWBALL_NAME and STEMMERLESS_LANGUAGES have one
-# section further up.
+# zh maps to chi_tra since issue #53, Traditional Chinese, the one script the
+# Chinese work of that issue is tested and maintained for. A Simplified
+# Chinese scan read with chi_tra loses the characters whose shapes differ; no
+# chi_sim is installed, and the startup warning cannot tell the two apart.
 TESSERACT_NAME = {
     "de": "deu",
     "en": "eng",
@@ -568,27 +567,8 @@ TESSERACT_NAME = {
     "nl": "nld",
     "pt": "por",
     "cs": "ces",
+    "zh": "chi_tra",
 }
-
-# The body languages this image has no Tesseract model for, and the other
-# direction of the harmless one named above: a language the index analyses
-# and no scanner can read. zh is the one entry, since issue #53: born digital
-# Chinese text (a PDF text layer, DOCX, ODT, plain text) is extracted without
-# OCR and is found through body_zh, while a scanned Chinese page is read with
-# the models FINDLING_OCR_LANGUAGES names and lands in the index as noise.
-#
-# So a code here is always uncovered: findling.main.warn_on_uncovered_languages
-# counts it whatever FINDLING_OCR_LANGUAGES says, which is the Buchstabensalat
-# warning saying the truth rather than staying quiet. It is a closed set and not
-# a missing key, so that the gap is named in one place and a test can hold it:
-# backend/tests/test_ocr_languages.py asserts that this set and the keys of
-# TESSERACT_NAME make up SUPPORTED_LANGUAGES exactly and do not overlap.
-#
-# The Tesseract pack for Traditional Chinese, chi_tra, follows in the next pull
-# request of issue #53. That change adds "zh": "chi_tra" above, puts chi_tra
-# into OCR_LANGUAGE_ALLOWLIST with its apt line, and retires this set together
-# with its branch in findling.main.warn_on_uncovered_languages.
-SCANNERLESS_LANGUAGES = frozenset({"zh"})
 
 # Pages per document before the OCR loop stops and the state becomes truncated.
 # 30, not the 100 that STACK.md names, and the deviation is deliberate: an OCR

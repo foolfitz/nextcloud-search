@@ -2788,8 +2788,16 @@ PHP_TREE_HASH_TODAY = "3577bd320b901cb68fced37bcc004893da66cf85cd35dbbce5a037d21
 # sha256sum over the CRLF normalised tree: 83c9b197... both ways, and the same
 # pipeline over git archive HEAD before the step gave ee8377c7... (positive
 # control).
+#
+# Moved on 2026-11-15 by zh reading its scans through chi_tra (issue #53):
+# config.py maps zh to chi_tra in TESSERACT_NAME and retires
+# SCANNERLESS_LANGUAGES, main.py asks TESSERACT_NAME alone again. No file came
+# or went, so PACKAGE_FILES_TODAY stays at 83. The PHP pair does not move.
+# Recomputed independently with find, sort, sed and sha256sum over the CRLF
+# normalised tree: 63c5bad9... both ways, and the same pipeline over git
+# archive HEAD before the step gave 83c9b197... (positive control).
 PACKAGE_FILES_TODAY = 83
-PACKAGE_TREE_HASH_TODAY = "83c9b197d8a0015d5d694e3bac85c5674a92936d0b5ec56faed86cbdeb44a956"
+PACKAGE_TREE_HASH_TODAY = "63c5bad926468126e20ebbbb4665935dc9e95bad2f928b2a0c30ebf5b4a0d27c"
 
 # The raw reading of the run, so that the constant above cannot drift away from
 # the file it was read out of.
