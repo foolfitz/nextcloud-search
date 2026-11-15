@@ -85,3 +85,10 @@ backend/tests/fixtures/lucene_cz_stopwords_10_5_2.txt -text
 # machine where nothing is wrong, and the old side would no longer be the file
 # 1.4.2 shipped.
 backend/tests/fixtures/exclusion_v1_4_2/** -text
+
+# The Traditional Chinese strip of the chi_tra image step (issue #53), drawn by
+# scripts/dev/build_zh_ocr_probe.py and pinned there by its sha256, which
+# backend/tests/test_ocr_languages.py compares with the committed bytes. A PNG
+# carries NUL bytes and is binary to git anyway; the line says so rather than
+# relying on the heuristic, like the fonts above.
+testdata/ocr-zh/** -text

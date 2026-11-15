@@ -443,6 +443,29 @@ jobs:
             --entrypoint python \
             "${IMAGE}@${DIGEST}" /probe/probe_image_ocr_czech.py /fonts/DejaVuSans.ttf
 
+      # Issue #53, the Czech step for chi_tra. What this proves:
+      # tesseract-ocr-chi-tra is in the image, and a strip of Traditional
+      # Chinese read with -l chi_tra comes back as text that the chain of
+      # body_zh turns into the expected words as consecutive tokens, the shape
+      # a search for them matches. The same strip read with eng has to carry no
+      # Han character (the Latin models cannot write one, so the check tells
+      # the models apart), and a white page of the same size has to stay empty.
+      # The strip is committed (testdata/ocr-zh, drawn by
+      # scripts/dev/build_zh_ocr_probe.py), because the font of the Czech step
+      # has no Han glyph. What it does not prove: character accuracy; four of
+      # five expected words are enough, see the docstring of the script.
+      # Network cut, digest reference, both architectures of the matrix.
+      - name: Traditional Chinese OCR in the image (#53)
+        env:
+          DIGEST: ${{ steps.push.outputs.digest }}
+        run: |
+          echo "expected: chi_tra listed, at least 4 of 5 Chinese words as consecutive tokens, no Han character when read with eng, 0 tokens on a white page"
+          docker run --rm --network none \
+            -v "${GITHUB_WORKSPACE}/backend/tests:/probe:ro" \
+            -v "${GITHUB_WORKSPACE}/testdata/ocr-zh:/strip:ro" \
+            --entrypoint python \
+            "${IMAGE}@${DIGEST}" /probe/probe_image_ocr_chinese.py /strip/probe-zh-tw.png
+
       # FMT-05 and D-31-06 (plan 31-07). Part 1 is the gate: a HEIC with a
       # rendered sentence, written at run time by the encoder in the pillow-heif
       # wheel, read by extract_image in a child under the real RLIMIT_AS, has

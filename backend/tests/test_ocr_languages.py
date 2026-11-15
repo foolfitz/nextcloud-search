@@ -44,6 +44,8 @@ into terms, and an instance can legitimately want one without the other.
 
 from __future__ import annotations
 
+import ast
+import hashlib
 import logging
 import re
 from collections.abc import Mapping
@@ -62,6 +64,14 @@ from findling.config import (
 from findling.main import warn_on_uncovered_languages
 
 DOCKERFILE = Path(__file__).resolve().parents[1] / "Dockerfile"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+# The image step for chi_tra reads a committed strip instead of drawing one
+# (the font of the Czech step has no Han glyph). The generator, the strip and
+# the probe are three files, and the two cases at the end hold them together.
+STRIP = REPO_ROOT / "testdata" / "ocr-zh" / "probe-zh-tw.png"
+STRIP_GENERATOR = REPO_ROOT / "scripts" / "dev" / "build_zh_ocr_probe.py"
+CHINESE_PROBE = Path(__file__).resolve().parent / "probe_image_ocr_chinese.py"
 
 # The one pin every language pack of this image carries. The subject of the
 # assertion is the version: an unpinned pack is a different traineddata after
@@ -506,3 +516,46 @@ def test_the_warning_refuses_nothing_and_the_container_comes_up(
     assert answer.status_code == 200
     assert active == ("de", "en", "es")
     assert [record for record in caplog.records if "FINDLING_LANGUAGES" in record.getMessage()] != []
+
+
+# -- the strip of the image step for chi_tra ------------------------------------
+
+
+def _constant(path: Path, name: str) -> object:
+    """One module level constant, read out of the syntax tree of a script.
+
+    Read rather than imported: the generator needs a font that no development
+    machine has at that path, and the probe needs the engine of the image.
+    """
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        if isinstance(node, ast.AnnAssign | ast.Assign):
+            targets = [node.target] if isinstance(node, ast.AnnAssign) else node.targets
+            if any(isinstance(target, ast.Name) and target.id == name for target in targets):
+                assert node.value is not None
+                return ast.literal_eval(node.value)
+    message = f"{name} is not defined in {path.name}"
+    raise AssertionError(message)
+
+
+def test_the_committed_strip_is_the_one_its_generator_names() -> None:
+    """The bytes the image step reads are the bytes the generator pinned.
+
+    A replaced picture would make the step prove something about a strip
+    nobody can draw again; the generator refuses to agree with it in --check,
+    and this case says so without the font.
+    """
+    assert hashlib.sha256(STRIP.read_bytes()).hexdigest() == _constant(STRIP_GENERATOR, "PNG_SHA256")
+
+
+def test_every_word_the_probe_expects_is_on_the_strip() -> None:
+    """The probe looks for words the generator drew, and only for those.
+
+    A word that is not on the strip could never be found, and the four of five
+    the probe asks for would then be four of four without anybody saying so.
+    """
+    sentence = _constant(STRIP_GENERATOR, "SENTENCE")
+    expected = _constant(CHINESE_PROBE, "EXPECTED")
+    assert isinstance(sentence, str)
+    assert isinstance(expected, tuple)
+    assert [word for word in expected if word not in sentence] == []
+    assert _constant(CHINESE_PROBE, "REQUIRED_HITS") == len(expected) - 1

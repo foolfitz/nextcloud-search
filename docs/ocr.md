@@ -110,6 +110,11 @@ mit `tesseract --list-langs` geprüft wie die anderen, und
 `OCR_LANGUAGE_ALLOWLIST` in `backend/src/findling/config.py` hat damit elf
 Einträge. Der Standard bleibt `deu+eng+fra`. Das Paket kostet die Schicht des
 Abbilds 2.383.872 Byte, fast ganz die `chi_tra.traineddata` mit 2.366.642 Byte.
+Der Bild-Beweis läuft in `.github/workflows/docker.yml` im Schritt
+"Traditional Chinese OCR in the image (#53)" auf amd64 und arm64: ein
+eingecheckter Streifen mit chinesischem Text (`testdata/ocr-zh/probe-zh-tw.png`,
+gezeichnet von `scripts/dev/build_zh_ocr_probe.py`) wird im gebauten Abbild über
+`-l chi_tra` gelesen (`backend/tests/probe_image_ocr_chinese.py`).
 
 **Die Schreibweise.** Debian schreibt das Paket mit Bindestrich, tesseract und
 die Einstellung mit Unterstrich: `FINDLING_OCR_LANGUAGES=chi_tra+eng`. Wer
