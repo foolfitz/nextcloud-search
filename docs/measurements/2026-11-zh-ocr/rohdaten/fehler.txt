@@ -1,0 +1,23 @@
+== ming-clean-00-J0070017.pdf, chi_tra, whitespace removed
+24	replace	'，'	','
+3	replace	'雇'	'選'
+2	replace	'契'	'奉'
+2	replace	'雇'	'屋'
+1	delete	'三'	''
+1	delete	'五'	''
+1	delete	'四'	''
+1	insert	''	'出于山1'
+1	replace	'及'	'反'
+1	replace	'契'	'替'
+1	replace	'契'	'鴨'
+1	replace	'雇'	'座'
+1	replace	'雇'	'殿'
+1	replace	'︰一、憲法、法律、命令或公文。二'	':'
+1	replace	'，從其約定。'	','
+== DACH pages, chi_tra+deu+eng+fra, ocr_quality.normalise
+page 1	replace	'en Vorlage für den Gemein'	'en Vorlage fur den Gemein'
+  de	'für' -> []	'fur' -> ['fur']
+  en	'für' -> ['fur']	'fur' -> ['fur']
+page 4	replace	'on, Kanton Zürich Bauamt '	'on, Kanton Zurich Bauamt '
+  de	'Zürich' -> ['zurich']	'Zurich' -> ['zurich']
+  en	'Zürich' -> ['zurich']	'Zurich' -> ['zurich']

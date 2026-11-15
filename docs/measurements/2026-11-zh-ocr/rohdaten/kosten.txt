@@ -1,0 +1,11 @@
+page	languages	seconds(3 runs)	median	peak_rss_kB(max)	as_floor
+german	deu+eng+fra	[0.54, 0.54, 0.54]	0.54	90360	128 MB (rc 0, 724 bytes)
+german	chi_tra	[0.75, 0.74, 0.75]	0.75	102460	128 MB (rc 0, 705 bytes)
+german	chi_tra+eng	[0.84, 0.84, 0.86]	0.84	121820	192 MB (rc 0, 707 bytes)
+german	chi_tra+deu+eng+fra	[0.67, 0.67, 0.68]	0.67	143516	192 MB (rc 0, 723 bytes)
+german	deu+eng+fra+chi_tra	[0.6, 0.6, 0.6]	0.60	139180	192 MB (rc 0, 724 bytes)
+chinese	deu+eng+fra	[2.32, 2.33, 2.31]	2.32	105712	128 MB (rc 0, 942 bytes)
+chinese	chi_tra	[1.27, 1.27, 1.26]	1.27	110384	192 MB (rc 0, 1986 bytes)
+chinese	chi_tra+eng	[1.91, 1.91, 1.89]	1.91	130508	192 MB (rc 0, 1962 bytes)
+chinese	chi_tra+deu+eng+fra	[3.12, 3.12, 3.14]	3.12	164332	192 MB (rc 0, 1962 bytes)
+chinese	deu+eng+fra+chi_tra	[2.91, 2.91, 2.92]	2.91	164748	192 MB (rc 0, 2484 bytes)

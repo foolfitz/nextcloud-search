@@ -1,0 +1,53 @@
+# Measurement images of docs/measurements/2026-11-zh-ocr. Not the product image.
+# Stage "ten" repeats the apt block of backend/Dockerfile at e5c1da7 verbatim,
+# stage "eleven" is the same block plus tesseract-ocr-chi-tra, so the size of
+# the two RUN layers is the image size delta of the change and nothing else.
+ARG BASE_IMAGE=python:3.13-slim-trixie@sha256:ffb752e139c0a19692a43af8d8523b274222dd68eebad5d583b45c2201c6e30a
+
+FROM ${BASE_IMAGE} AS ten
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        tesseract-ocr \
+        tesseract-ocr-deu=1:4.1.0-2 \
+        tesseract-ocr-eng=1:4.1.0-2 \
+        tesseract-ocr-fra=1:4.1.0-2 \
+        tesseract-ocr-spa=1:4.1.0-2 \
+        tesseract-ocr-ita=1:4.1.0-2 \
+        tesseract-ocr-nld=1:4.1.0-2 \
+        tesseract-ocr-por=1:4.1.0-2 \
+        tesseract-ocr-dan=1:4.1.0-2 \
+        tesseract-ocr-est=1:4.1.0-2 \
+        tesseract-ocr-ces=1:4.1.0-2 \
+        tesseract-ocr-osd=1:4.1.0-2 \
+    && rm -rf /var/lib/apt/lists/*
+
+FROM ${BASE_IMAGE} AS eleven
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        tesseract-ocr \
+        tesseract-ocr-deu=1:4.1.0-2 \
+        tesseract-ocr-eng=1:4.1.0-2 \
+        tesseract-ocr-fra=1:4.1.0-2 \
+        tesseract-ocr-spa=1:4.1.0-2 \
+        tesseract-ocr-ita=1:4.1.0-2 \
+        tesseract-ocr-nld=1:4.1.0-2 \
+        tesseract-ocr-por=1:4.1.0-2 \
+        tesseract-ocr-dan=1:4.1.0-2 \
+        tesseract-ocr-est=1:4.1.0-2 \
+        tesseract-ocr-ces=1:4.1.0-2 \
+        tesseract-ocr-chi-tra=1:4.1.0-2 \
+        tesseract-ocr-osd=1:4.1.0-2 \
+    && rm -rf /var/lib/apt/lists/* \
+    && tesseract --list-langs 2>&1 | grep -qx chi_tra
+
+# The measuring stage: the eleven languages, the pinned Python packages the OCR
+# path imports (versions from backend/uv.lock), and the fonts the page renderer
+# draws with. Fonts and wheels are measurement tools, not part of the delta.
+FROM eleven AS measure
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        fonts-noto-cjk=1:20240730+repack1-1 \
+        fonts-arphic-ukai=0.2.20080216.2-5 \
+        tesseract-ocr-chi-tra-vert=1:4.1.0-2 \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir pypdfium2==5.14.0 pillow==13.0.0 tantivy==0.26.2

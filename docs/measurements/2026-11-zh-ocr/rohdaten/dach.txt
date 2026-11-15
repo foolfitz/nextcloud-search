@@ -1,0 +1,56 @@
+== FINDLING_OCR_LANGUAGES=deu+eng+fra
+ocr character error rate, dpi=300 languages=3
+page 1         variant=de chars=701    errors=0     cer=0.000000
+page 2         variant=de chars=561    errors=0     cer=0.000000
+page 3         variant=de chars=316    errors=0     cer=0.000000
+page 4         variant=ch chars=656    errors=0     cer=0.000000
+page 5         variant=at chars=587    errors=0     cer=0.000000
+page 6         variant=de chars=327    errors=0     cer=0.000000
+
+variant=at     pages=1   chars=587    errors=0     cer=0.000000
+variant=ch     pages=1   chars=656    errors=0     cer=0.000000
+variant=de     pages=4   chars=1905   errors=0     cer=0.000000
+overall        pages=6   chars=3148   errors=0     cer=0.000000
+bar=0.050000 verdict=ok
+== FINDLING_OCR_LANGUAGES=deu+eng+fra+chi_tra
+ocr character error rate, dpi=300 languages=4
+page 1         variant=de chars=701    errors=0     cer=0.000000
+page 2         variant=de chars=561    errors=0     cer=0.000000
+page 3         variant=de chars=316    errors=0     cer=0.000000
+page 4         variant=ch chars=656    errors=0     cer=0.000000
+page 5         variant=at chars=587    errors=0     cer=0.000000
+page 6         variant=de chars=327    errors=0     cer=0.000000
+
+variant=at     pages=1   chars=587    errors=0     cer=0.000000
+variant=ch     pages=1   chars=656    errors=0     cer=0.000000
+variant=de     pages=4   chars=1905   errors=0     cer=0.000000
+overall        pages=6   chars=3148   errors=0     cer=0.000000
+bar=0.050000 verdict=ok
+== FINDLING_OCR_LANGUAGES=chi_tra+deu+eng+fra
+ocr character error rate, dpi=300 languages=4
+page 1         variant=de chars=701    errors=1     cer=0.001427
+page 2         variant=de chars=561    errors=0     cer=0.000000
+page 3         variant=de chars=316    errors=0     cer=0.000000
+page 4         variant=ch chars=656    errors=1     cer=0.001524
+page 5         variant=at chars=587    errors=0     cer=0.000000
+page 6         variant=de chars=327    errors=0     cer=0.000000
+
+variant=at     pages=1   chars=587    errors=0     cer=0.000000
+variant=ch     pages=1   chars=656    errors=1     cer=0.001524
+variant=de     pages=4   chars=1905   errors=1     cer=0.000525
+overall        pages=6   chars=3148   errors=2     cer=0.000635
+bar=0.050000 verdict=ok
+== FINDLING_OCR_LANGUAGES=chi_tra+eng
+ocr character error rate, dpi=300 languages=2
+page 1         variant=de chars=701    errors=19    cer=0.027104
+page 2         variant=de chars=561    errors=15    cer=0.026738
+page 3         variant=de chars=316    errors=7     cer=0.022152
+page 4         variant=ch chars=656    errors=13    cer=0.019817
+page 5         variant=at chars=587    errors=6     cer=0.010221
+page 6         variant=de chars=327    errors=3     cer=0.009174
+
+variant=at     pages=1   chars=587    errors=6     cer=0.010221
+variant=ch     pages=1   chars=656    errors=13    cer=0.019817
+variant=de     pages=4   chars=1905   errors=44    cer=0.023097
+overall        pages=6   chars=3148   errors=63    cer=0.020013
+bar=0.050000 verdict=ok

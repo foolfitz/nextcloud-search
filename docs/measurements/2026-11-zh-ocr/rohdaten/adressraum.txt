@@ -1,0 +1,6 @@
+pages 69 (Chinese 63, DACH 6)
+languages	128MB	160MB	192MB	256MB	320MB	384MB	448MB	512MB	failed	largest
+chi_tra	18	51	0	0	0	0	0	0	0	160MB
+chi_tra+deu+eng+fra	0	2	59	8	0	0	0	0	0	256MB
+deu+eng+fra+chi_tra	0	6	55	8	0	0	0	0	0	256MB
+chi_tra+chi_tra_vert	0	1	52	16	0	0	0	0	0	256MB

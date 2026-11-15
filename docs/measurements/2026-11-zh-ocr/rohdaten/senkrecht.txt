@@ -1,0 +1,5 @@
+languages	han_drawn	han_read	cer_han	recall4
+chi_tra	344	325	0.9884	0.0000
+chi_tra_vert	344	342	0.0494	0.8069
+chi_tra+chi_tra_vert	344	342	0.0494	0.8069
+chi_tra_vert+chi_tra	344	342	0.0494	0.8069
