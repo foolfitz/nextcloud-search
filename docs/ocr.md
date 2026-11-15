@@ -101,6 +101,130 @@ ohne Stammformreduktion); die Kette ist eine eigene Einstellung
 (`FINDLING_LANGUAGES`) und in `docs/language-analyzers.md`, Abschnitt "Czech",
 beschrieben. Die Zahlen dieser Seite bleiben unverändert stehen.
 
+## Nachtrag 15.11.2026: Traditionelles Chinesisch als elfte Sprache
+
+Seit Issue #53 installiert das Abbild ein elftes Sprachpaket: `chi_tra`,
+Traditionelles Chinesisch, als `tesseract-ocr-chi-tra` aus derselben Quelle
+`tesseract-lang` und in derselben harten Fassung `1:4.1.0-2`. Es wird beim Bau
+mit `tesseract --list-langs` geprüft wie die anderen, und
+`OCR_LANGUAGE_ALLOWLIST` in `backend/src/findling/config.py` hat damit elf
+Einträge. Der Standard bleibt `deu+eng+fra`. Das Paket kostet die Schicht des
+Abbilds 2.383.872 Byte, fast ganz die `chi_tra.traineddata` mit 2.366.642 Byte.
+
+**Die Schreibweise.** Debian schreibt das Paket mit Bindestrich, tesseract und
+die Einstellung mit Unterstrich: `FINDLING_OCR_LANGUAGES=chi_tra+eng`. Wer
+`chi-tra` einträgt, bekommt die übliche Warnung, und der Eintrag fällt weg wie
+jede Sprache, die das Abbild nicht kennt.
+
+**Ohne `chi_tra` ist ein chinesischer Scan für den Index verloren.** Die
+Messung vom 15.11.2026 (`docs/measurements/2026-11-zh-ocr`) liest 63
+gerenderte A4-Seiten mit 38.844 Han-Zeichen, Gesetzestext und einen
+gemischten Brief, in drei Schriften und drei Behandlungen (sauber, simulierter
+Scan, Fax), über genau die Aufrufform dieser Seite. Gezählt wird die
+Fehlerrate über die Han-Zeichen allein und der Anteil der
+Vier-Zeichen-Folgen, die Token für Token als aufeinanderfolgende Token
+zurückkommen, also das, was ein vierstelliger Suchbegriff in `body_zh` so
+braucht, wie er eingetippt wurde (die Suche nach 臺 und 台 in beiden Formen
+ist nicht mitgezählt und kann nur Treffer hinzufügen):
+
+| `FINDLING_OCR_LANGUAGES` | Fehlerrate Han | Vierer-Folgen gefunden | Leerzeichen zwischen Han-Zeichen | s je Seite |
+|---|---|---|---|---|
+| `deu+eng+fra` (Standard) | 1,000 (kein einziges Han-Zeichen) | 0,0 % | 0 | 3,18 |
+| `chi_tra` | 0,034 | 92,7 % | 370 | 1,82 |
+| `chi_tra+eng` | 0,040 | 91,9 % | 332 | 2,67 |
+| `chi_tra+deu+eng+fra` | 0,044 | 91,5 % | 325 | 4,50 |
+| `deu+eng+fra+chi_tra` | 0,045 | 91,4 % | 26.707 | 4,27 |
+
+Die Sekunden stammen aus einem parallelen Lauf und sind nur untereinander
+vergleichbar; die seriellen Werte stehen weiter unten.
+
+**Die Reihenfolge entscheidet.** Steht
+`chi_tra` hinter den lateinischen Modellen, setzt tesseract zwischen die
+meisten Paare von Han-Zeichen ein Leerzeichen: 26.707 Mal auf diesen Seiten,
+gegen 370 Mal mit `chi_tra` allein. Die Suche über `body_zh` merkt davon
+nichts, weil die Kette aufeinanderfolgenden Han-Zeichen aufeinanderfolgende
+Positionen gibt, was auch dazwischen steht. Der gespeicherte Text behält die
+Leerzeichen, und mit ihm die Ausschnitte, der Umbau aus `body_de` und die
+Einbettungen. Was sie der semantischen Suche antun, ist nicht gemessen; ein
+Nachbearbeitungsschritt, der sie entfernt, wäre eine eigene Änderung mit
+eigenen Zahlen und ist nicht Teil dieser.
+
+Daraus folgen Einstellungen nach der Sprache, in der die meisten Scans
+einer Instanz stehen:
+
+| Bestand | `FINDLING_OCR_LANGUAGES` | Was es kostet |
+|---|---|---|
+| nur chinesische Scans | `chi_tra` | nichts: die beste und die schnellste Liste für chinesische Seiten |
+| chinesisch und englisch | `chi_tra+eng` | etwas Chinesisch (0,040 statt 0,034), dafür lateinische Wörter sicherer (97,2 % statt 95,6 % auf dem gemischten Brief) |
+| überwiegend chinesisch, auch deutsch | `chi_tra+deu+eng+fra` | 2 Fehler in 3.148 Zeichen auf den DACH-Seiten, 325 eingefügte Leerzeichen im chinesischen Text |
+| überwiegend deutsch, auch chinesisch | `deu+eng+fra+chi_tra` | 0 Fehler auf den DACH-Seiten, 26.707 eingefügte Leerzeichen im chinesischen Text |
+
+`chi_tra+eng` ist für deutsche Scans die falsche Wahl: ohne `deu` gehen die
+Umlaute verloren, auf den DACH-Seiten 63 von 3.148 Zeichen (2,0 %), fast so
+viel wie mit `eng` allein im Bericht vom 06.09.2026 (64).
+
+**Deutsche Seiten.** Dasselbe Werkzeug wie im DACH-Bericht, über dieselben
+sechs Seiten: `deu+eng+fra+chi_tra` liest sie fehlerfrei,
+`chi_tra+deu+eng+fra` mit zwei Fehlern in 3.148 Zeichen, beide Male ein `ü`
+als `u` (`für`, `Zürich`). Keiner der beiden kostet einen Suchbegriff:
+`Zürich` und `Zurich` ergeben in der deutschen wie in der englischen Kette
+denselben Term, und `für` ist ein Stoppwort der deutschen Kette, die gelesene
+Form `fur` bleibt dort als zusätzlicher Term stehen; geprüft mit den
+ausgelieferten Ketten von `findling.index.analyzer`, die Ausgabe steht in
+`rohdaten/fehler.txt` der Messung. Hinten angehängt bleiben die deutschen
+Seiten fehlerfrei, die Suche über `body_zh` findet fast so viel wie vorn
+(91,4 % statt 91,5 % der Vierer-Folgen), und der Preis sind die Leerzeichen im
+gespeicherten chinesischen Text; daher die Wahl nach der Mehrheit oben.
+
+**Zeit und Speicher je Seite**, seriell, je dreimal, Seite 1 von
+`testdata/corpus/13-ratsvorlage-scan.pdf` (nicht die Seite von Messung 3) und
+eine saubere chinesische Seite:
+
+| Seite | `FINDLING_OCR_LANGUAGES` | Median s | Spitze RSS | Adressraum dieser Seite genügt ab |
+|---|---|---|---|---|
+| deutsch | `deu+eng+fra` | 0,54 | 88 MiB | 128 MB |
+| deutsch | `deu+eng+fra+chi_tra` | 0,60 | 136 MiB | 192 MB |
+| deutsch | `chi_tra+deu+eng+fra` | 0,67 | 140 MiB | 192 MB |
+| chinesisch | `chi_tra` | 1,27 | 108 MiB | 192 MB |
+| chinesisch | `chi_tra+eng` | 1,91 | 127 MiB | 192 MB |
+| chinesisch | `chi_tra+deu+eng+fra` | 3,12 | 160 MiB | 192 MB |
+
+Zwei Seiten sagen über den Adressraum wenig, deshalb lief dieselbe Leiter
+über alle 69 Seiten der Messung (63 chinesische, sechs DACH-Seiten): mit
+`chi_tra` allein genügen 128 oder 160 MB, mit `chi_tra+deu+eng+fra`,
+`deu+eng+fra+chi_tra` oder `chi_tra+chi_tra_vert` brauchen 8 bis 16 Seiten
+256 MB, keine mehr. Mit `chi_tra` in der Liste reichen die 128 MB von
+Messung 2 also nicht mehr für jede Seite. `EXTRACT_ADDRESS_SPACE_BYTES` bleibt
+bei 512 MB, dem Doppelten des größten gemessenen Bedarfs.
+
+Die Analysekette für chinesischen Text ist eine eigene Einstellung
+(`FINDLING_LANGUAGES` mit `zh`) und in `docs/language-analyzers.md`, Abschnitt
+"Chinese", beschrieben. Vereinfachtes Chinesisch (`chi_sim`) ist nicht
+installiert und nicht gemessen. Die Seiten der Messung sind gerendert und
+absichtlich verschlechtert, kein echter Scan; die Zahlen dieser Seite oberhalb
+des Nachtrags bleiben unverändert stehen.
+
+### Senkrechter Satz: `chi_tra_vert` dokumentiert, nicht installiert
+
+**`chi_tra` liest senkrecht gesetzten Text nicht.** Eine Seite des
+Urheberrechtsgesetzes in Spalten von oben nach unten und von rechts nach links,
+gelesen mit dem festen `--psm 3` der Aufrufform: Fehlerrate über die
+Han-Zeichen 0,988, keine einzige Vierer-Folge gefunden. Das senkrechte Modell
+`chi_tra_vert` liest dieselbe Seite mit 0,049 und findet 80,7 % der
+Vierer-Folgen, allein und zusammen mit `chi_tra`. Das ist **eine einzige
+Seite**, ein Hinweis und keine Rate.
+
+Das Paket gibt es in trixie: `tesseract-ocr-chi-tra-vert` `1:4.1.0-2`,
+`Architecture: all`, Quelle `tesseract-lang`, 1797 kB installiert, Download
+1.092.616 Byte. Es ist nicht installiert, weil es nur hilft, wenn ein Admin es
+in die Liste aufnimmt, und dann jede waagerechte Seite rund 1,6 Mal so lange
+braucht (`chi_tra+chi_tra_vert` gegen `chi_tra`, bei gleicher Erkennung).
+Einschalten heißt zwei Dinge in einer Änderung: die apt-Zeile mit ihrer
+`--list-langs`-Prüfung in `backend/Dockerfile` und `chi_tra_vert` in der
+Positivliste von `backend/src/findling/config.py`. Die Gates in
+`backend/tests/test_ocr_languages.py` lesen den dreiteiligen Namen
+`chi-tra-vert` bereits und melden, wenn nur eine der beiden Hälften kommt.
+
 ## Die Deckel-Kaskade
 
 Vier Zeitdeckel und ein Speicherdeckel greifen ineinander, und die Reihenfolge

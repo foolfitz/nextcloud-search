@@ -78,7 +78,7 @@ separately.** `FINDLING_LANGUAGES` decides which analysis chains an index
 carries: `de`, `en`, `es`, `it`, `nl`, `pt`, `cs`, `zh`, factory setting `de,en`.
 `FINDLING_OCR_LANGUAGES` decides which models tesseract loads when it reads a
 scan: `deu`, `eng`, `fra`, `spa`, `ita`, `nld`, `por`, `dan`, `est`, `ces`,
-factory setting `deu+eng+fra`. Neither follows the other, and that is deliberate: an
+`chi_tra`, factory setting `deu+eng+fra`. Neither follows the other, and that is deliberate: an
 instance with born digital Spanish documents needs the Spanish chain and no
 Spanish scanner, and an instance that scans French post needs the French scanner
 while French has no chain in this build at all.
